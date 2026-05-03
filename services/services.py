@@ -14,16 +14,59 @@ def connection():
     finally:
         conn.close()
 
-class Services():
+class UserTaskService:
     def new_user(self, username, email, password):
         with connection() as cursor:
             cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
                            (username, email, password))
+            return cursor.rowcount
             
     def edit_username(self, user_id, new_username):
         with connection() as cursor:
             cursor.execute("UPDATE users SET username = ? WHERE id = ?", (new_username, user_id))
+            return cursor.rowcount
     
     def delete_user(self, user_id):
         with connection() as cursor:
-            cursor.execute("DEFELE FROM users WHERE id = ?", (user_id))
+            cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+            return cursor.rowcount
+
+    def get_user(self, user_id):
+        with connection() as cursor:
+            cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+            return cursor.fetchone()
+
+    def new_task(self, user_id, title, description):
+        with connection() as cursor:
+            cursor.execute("INSERT INTO tasks (user_id, title, description) VALUES (?, ?, ?)",
+                           (user_id, title, description))
+            return cursor.rowcount
+    
+    def complete_task(self, task_id):
+        with connection() as cursor:
+            cursor.execute("UPDATE tasks SET status = 1 WHERE id = ?", (task_id,))
+            return cursor.rowcount
+
+    def reopen_task(self, task_id):
+        with connection() as cursor:
+            cursor.execute("UPDATE tasks SET status = 0 WHERE id = ?", (task_id,))
+            return cursor.rowcount
+
+    def get_tasks_by_user(self, user_id):
+        with connection() as cursor:
+            cursor.execute("SELECT * FROM tasks WHERE user_id = ?", (user_id,))   
+            return cursor.fetchall()
+
+    def get_task_by_id(self, task_id):
+        with connection() as cursor:
+            cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+            return cursor.fetchone()     
+        
+    def get_all_tasks(self):
+        with connection() as cursor:
+            cursor.execute("SELECT * FROM tasks")
+            return cursor.fetchall()
+
+    def delete_task(self, task_id):
+        with connection() as cursor:
+            cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
