@@ -1,5 +1,6 @@
 from data.db import connect
 from contextlib import contextmanager
+from utils.security import hash_password, verify_password
 
 @contextmanager
 def connection():
@@ -13,13 +14,24 @@ def connection():
         raise e
     finally:
         conn.close()
-
+    
 class UserTaskService:
     def new_user(self, username, email, password):
+        hashed_password = hash_password(password)
         with connection() as cursor:
             cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-                           (username, email, password))
+                           (username, email, hashed_password))
             return cursor.rowcount
+        
+    def login(self, username, password):
+        with connection() as cursor:
+            cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+            user = cursor.fetchone()
+            if user:
+                stored_hash = user[4]
+                if verify_password(password, stored_hash):
+                    return user
+            return None
             
     def edit_username(self, user_id, new_username):
         with connection() as cursor:
