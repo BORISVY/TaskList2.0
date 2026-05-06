@@ -15,7 +15,7 @@ def create_table():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL CHECK (email LIKE '%@%.%'),
-            password TEXT NOT NULL)
+            password BLOB NOT NULL)
                    ''')
     
     cursor.execute('''
@@ -25,6 +25,7 @@ def create_table():
             title TEXT NOT NULL,
             description TEXT,
             status BOOLEAN NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE)
                    ''')
     

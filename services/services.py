@@ -27,11 +27,14 @@ class UserTaskService:
         with connection() as cursor:
             cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
             user = cursor.fetchone()
-            if user:
-                stored_hash = user[4]
-                if verify_password(password, stored_hash):
-                    return user
-            return None
+            if not user:
+                return None
+
+            stored_hash = user[3]
+
+            if not verify_password(password, stored_hash):
+                return None
+            return user
             
     def edit_username(self, user_id, new_username):
         with connection() as cursor:
