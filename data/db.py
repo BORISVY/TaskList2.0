@@ -5,7 +5,10 @@ FOLDER = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(FOLDER, "secrets.db")
 
 def connect():
-    return sqlite3.connect(DB)
+    conn = sqlite3.connect(DB)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
 def create_table():
     conn = connect()
@@ -15,7 +18,7 @@ def create_table():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL CHECK (email LIKE '%@%.%'),
-            password BLOB NOT NULL)
+            password TEXT NOT NULL)
                    ''')
     
     cursor.execute('''

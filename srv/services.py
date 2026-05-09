@@ -95,3 +95,4 @@ class UserTaskService:
     def delete_task(self, task_id):
         with connection() as cursor:
             cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+            return cursor.rowcount
